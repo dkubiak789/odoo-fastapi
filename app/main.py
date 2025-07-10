@@ -1,71 +1,67 @@
-from fastapi import FastAPI, HTTPException
-from xmlrpc import client
-from .config import settings
+"""
+FastAPI main application module.
 
-app = FastAPI(title="Odoo FastAPI Integration")
+This module initializes the FastAPI application and sets up the core configuration,
+including API routers, documentation, and the root endpoint.
 
+The application serves as a REST API interface for Odoo, providing modern HTTP endpoints
+instead of direct XML-RPC calls.
 
-def get_odoo_client():
-    """Create and return an Odoo XML-RPC client"""
-    common = client.ServerProxy(f'{settings.odoo_url}/xmlrpc/2/common')
-    uid = common.authenticate(
-        settings.odoo_db,
-        settings.odoo_username,
-        settings.odoo_password,
-        {}
-    )
-    if not uid:
-        raise HTTPException(status_code=401, detail="Odoo authentication failed")
+Attributes:
+    app: The main FastAPI application instance
+    api_router: Router containing all API version 1 endpoints
+    settings: Application configuration settings
+"""
 
-    models = client.ServerProxy(f'{settings.odoo_url}/xmlrpc/2/object')
-    return models, uid
+from fastapi import FastAPI
+
+from .api.v1.router import api_router
+from .core.config import settings
+
+app = FastAPI(
+    title=settings.app_name,
+    description="REST API interface for Odoo",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
+
+# Include API router with version prefix
+app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
-    return {
-        "message": "Welcome to Odoo FastAPI Integration",
-        "endpoints": {
-            "partners": "/partners",
-            "products": "/products"
+    """
+    Root endpoint providing API information and documentation links.
+
+    This endpoint serves as the entry point to the API, providing basic information
+    about the service and links to the available documentation.
+
+    Returns:
+        dict: A dictionary containing:
+            - message: Welcome message with the application name
+            - version: Current API version
+            - documentation: Dictionary with links to Swagger and ReDoc documentation
+            - api_version: Current API version string
+            - api_prefix: API version prefix for all endpoints
+
+    Example:
+        {
+            "message": "Welcome to Odoo FastAPI Integration",
+            "version": "1.0.0",
+            "documentation": {
+                "swagger": "/docs",
+                "redoc": "/redoc"
+            },
+            "api_version": "v1",
+            "api_prefix": "/api/v1"
         }
+    """
+    return {
+        "message": f"Welcome to {settings.app_name}",
+        "version": "1.0.0",
+        "documentation": {"swagger": "/docs", "redoc": "/redoc"},
+        "api_version": "v1",
+        "api_prefix": settings.api_v1_prefix,
     }
-
-
-@app.get("/partners")
-async def get_partners(limit: int = 10):
-    """Get partners from Odoo"""
-    try:
-        models, uid = get_odoo_client()
-        partners = models.execute_kw(
-            settings.odoo_db,
-            uid,
-            settings.odoo_password,
-            'res.partner',
-            'search_read',
-            [[['is_company', '=', True]]],
-            {'fields': ['name', 'email', 'phone'], 'limit': limit}
-        )
-        return {"partners": partners}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/products")
-async def get_products(limit: int = 10):
-    """Get products from Odoo"""
-    try:
-        models, uid = get_odoo_client()
-        products = models.execute_kw(
-            settings.odoo_db,
-            uid,
-            settings.odoo_password,
-            'product.template',
-            'search_read',
-            [[]],
-            {'fields': ['name', 'list_price', 'default_code'], 'limit': limit}
-        )
-        return {"products": products}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
