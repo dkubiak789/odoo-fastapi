@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "odoo-fastapi"
+version = "0.1.0"
+description = "FastAPI integration with Odoo 18"
+authors = ["Dariusz Kubiak <dkubiak.pl@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11.7"
+fastapi = "^0.109.0"
+uvicorn = "^0.27.0"
+python-dotenv = "^1.0.0"
+pydantic = "^2.5.3"
+pydantic-settings = "^2.1.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
