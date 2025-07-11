@@ -1,10 +1,3 @@
-"""
-Product schemas for data validation and serialization.
-
-This module contains Pydantic models for product-related data structures,
-ensuring proper data validation and serialization/deserialization.
-"""
-
 from decimal import Decimal
 from typing import Optional
 

@@ -1,22 +1,17 @@
-"""
-Products endpoints module.
+from typing import Dict, List
 
-This module contains all the API endpoints for product-related operations.
-"""
-
-from typing import List
-
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from ....core.constants import PRODUCT_FIELDS
+from ....core.security import get_current_user
 from ....schemas.product import Product
 from ....services.odoo import odoo
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])  # Enforces authentication
 
 
 @router.get("", response_model=List[Product])
-async def get_products(limit: int = 10):
+async def get_products(limit: int = 10) -> List[Dict]:
     """
     Get products from Odoo.
 
@@ -38,7 +33,7 @@ async def get_products(limit: int = 10):
 
 
 @router.get("/{product_id}", response_model=Product)
-async def get_product(product_id: int):
+async def get_product(product_id: int) -> Dict:
     """
     Get a single product from Odoo.
 

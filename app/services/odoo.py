@@ -52,5 +52,13 @@ class OdooService:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
+    def authenticate(self, username: str, password: str) -> bool:
+        """Authenticate user against Odoo."""
+        common = client.ServerProxy(f"{self.url}/xmlrpc/2/common")
+        uid = common.authenticate(self.db, username, password, {})
+        if not uid:
+            raise HTTPException(status_code=401, detail="Authentication failed")
+        return True
+
 
 odoo = OdooService()

@@ -26,7 +26,6 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Include API router with version prefix
 app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 
@@ -34,9 +33,6 @@ app.include_router(api_router, prefix=settings.api_v1_prefix)
 async def root():
     """
     Root endpoint providing API information and documentation links.
-
-    This endpoint serves as the entry point to the API, providing basic information
-    about the service and links to the available documentation.
 
     Returns:
         dict: A dictionary containing:

@@ -1,10 +1,3 @@
-"""
-Sale order schemas for data validation and serialization.
-
-This module contains Pydantic models for sale-related data structures,
-ensuring proper data validation and serialization/deserialization.
-"""
-
 from datetime import datetime
 from decimal import Decimal
 from typing import Any, List, Optional, Union

@@ -1,10 +1,3 @@
-"""
-Partner schemas for data validation and serialization.
-
-This module contains Pydantic models for partner-related data structures,
-ensuring proper data validation and serialization/deserialization.
-"""
-
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, constr

@@ -1,22 +1,17 @@
-"""
-Partners endpoints module.
+from typing import Dict, List
 
-This module contains all the API endpoints for partner-related operations.
-"""
-
-from typing import List
-
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from ....core.constants import PARTNER_FIELDS
+from ....core.security import get_current_user
 from ....schemas.partner import Partner
 from ....services.odoo import odoo
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.get("", response_model=List[Partner])
-async def get_partners(limit: int = 10):
+async def get_partners(limit: int = 10) -> List[Dict]:
     """
     Get partners from Odoo.
 
@@ -33,7 +28,7 @@ async def get_partners(limit: int = 10):
     """
     partners = await odoo.fetch_records(
         model="res.partner",
-        domain=[["is_company", "=", True]],
+        domain=[],
         fields=PARTNER_FIELDS,
         limit=limit,
     )
@@ -41,7 +36,7 @@ async def get_partners(limit: int = 10):
 
 
 @router.get("/{partner_id}", response_model=Partner)
-async def get_partner(partner_id: int):
+async def get_partner(partner_id: int) -> Dict:
     """
     Get a single partner from Odoo.
 

@@ -1,18 +1,13 @@
-"""
-Sales endpoints module.
-
-This module contains all the API endpoints for sale order-related operations.
-"""
-
 from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from ....core.constants import SALE_ORDER_FIELDS, SALE_ORDER_LINE_FIELDS
+from ....core.security import get_current_user
 from ....schemas.sale import SaleOrder
 from ....services.odoo import odoo
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 @router.get("", response_model=List[SaleOrder])
